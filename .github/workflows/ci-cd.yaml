@@ -103,7 +103,6 @@ jobs:
 
           # JWT Secret yang sama untuk semua container
           JWT_SECRET=$JWT_SECRET
-          JWT_TTL=1440
           
           EOF
 
