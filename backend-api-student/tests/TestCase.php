@@ -20,9 +20,13 @@ abstract class TestCase extends BaseTestCase
             'username' => Repository::USERNAME,
             'password' => Repository::PASSWORD
         ]);
+
         $cookies = $res->header('Set-Cookie');
-        preg_match('/access_token=([^;]+)/', $cookies, $matches);
-        $this->token = $matches[1] ?? null;
+        if (! $cookies || !preg_match('/access_token=([^;]+)/', $cookies, $matches)) {
+            throw new \RuntimeException("Failed to get access_token from login response");
+        }
+
+        $this->token = $matches[1];
     }
 
     protected function tearDown(): void

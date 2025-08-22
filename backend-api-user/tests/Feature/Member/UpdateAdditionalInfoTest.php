@@ -8,8 +8,6 @@ class UpdateAdditionalInfoTest extends MemberTestCase
 {
     function test_user_berhasil_update_additional_info_profile()
     {
-        $this->withoutExceptionHandling();
-
         $imagePath = base_path('tests/utils/image.jpg');
         $imageBase64 = base64_encode(file_get_contents($imagePath));
         $imageMime = mime_content_type($imagePath);
@@ -24,8 +22,6 @@ class UpdateAdditionalInfoTest extends MemberTestCase
                 'dob' => now(),
                 'address' => 'Jl. Menuju Sukses'
             ]);
-
-        $res->dump();
 
         $res->assertStatus(200)
             ->assertJson([

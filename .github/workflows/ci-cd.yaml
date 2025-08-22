@@ -219,7 +219,7 @@ jobs:
         if: failure()
         run: |
           cd docker/dev
-          echo "---- backend-api-user laravel.log ----"
+          echo "---- backend-api-student laravel.log ----"
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user cat storage/logs/laravel.log || true
 
       # Step 6: Cleanup
