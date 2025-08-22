@@ -24,7 +24,6 @@
 **/backend-api-*/storage/oauth-private.key
 **/backend-api-*/storage/oauth-public.key
 **/backend-api-*/.phpunit.result.cache
-**/backend-api-*/artisan
 
 # DLL files (kayaknya custom Anda)
 **/dll/
