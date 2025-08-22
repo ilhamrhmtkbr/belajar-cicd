@@ -28,6 +28,8 @@ class UpdateAdditionalInfoTest extends MemberTestCase
                 "success" => true,
                 "message" => "Additional Info changed successfully : First"
             ]);
+
+        $res->dump();
     }
 
     function test_user_gagal_update_additional_info_profile_karena_tidak_mengirimkan_data_apapun()

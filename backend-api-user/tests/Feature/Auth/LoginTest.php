@@ -30,8 +30,6 @@ class LoginTest extends TestCase
                 "message" => "Login successfully"
             ]);
 
-        $res->dump();   // supaya responsenya muncul di CI log
-
         Helper::deleteUser();
     }
 
