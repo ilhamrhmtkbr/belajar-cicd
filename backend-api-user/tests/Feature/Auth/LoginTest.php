@@ -18,6 +18,8 @@ class LoginTest extends TestCase
 
     function test_user_berhasil_login()
     {
+        $this->withoutExceptionHandling();
+
         Helper::insertUser();
         $res = $this->postJson(self::$url . '/login', [
             'username' => Helper::USERNAME,
@@ -29,6 +31,9 @@ class LoginTest extends TestCase
                 "success" => true,
                 "message" => "Login successfully"
             ]);
+
+        $res->dump();   // supaya responsenya muncul di CI log
+
         Helper::deleteUser();
     }
 

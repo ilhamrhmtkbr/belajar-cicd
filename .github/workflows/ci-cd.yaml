@@ -163,12 +163,6 @@ jobs:
           # Check if all containers are running
           sudo docker compose -f docker-compose.ci.yaml ps
 
-      - name: Debug container files
-        run: |
-          cd docker/dev
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /app || true
-
       # Step 4: Setup Laravel applications
       - name: Setup Laravel Applications
         run: |
@@ -189,10 +183,11 @@ jobs:
           for service in student instructor forum public; do
             echo "Setting up backend-api-$service..."
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan migrate:fresh --seed --force
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
           done
+          
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan migrate:fresh --seed
 
           echo "✅ All Laravel applications setup completed!"
 
@@ -205,21 +200,28 @@ jobs:
 
           # Test dalam urutan dependency
           echo "Testing backend-api-user (base service)..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-student..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-instructor..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-forum..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-public..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
 
           echo "✅ All integration tests passed!"
+
+      - name: Show Laravel Logs
+        if: failure()
+        run: |
+          cd docker/dev
+          echo "---- backend-api-user laravel.log ----"
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user cat storage/logs/laravel.log || true
 
       # Step 6: Cleanup
       - name: Cleanup Docker
