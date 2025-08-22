@@ -156,7 +156,7 @@ jobs:
           sleep 30
 
           # Start services yang depend ke user API
-          sudo docker compose -f docker-compose.ci.yaml up -d backend-api-student backend-api-instructor backend-api-forum backend-api-public1
+          sudo docker compose -f docker-compose.ci.yaml up -d backend-api-student backend-api-instructor backend-api-forum backend-api-public
           echo "⏳ Waiting for all APIs..."
           sleep 45
 
@@ -211,7 +211,7 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --stop-on-failure
 
           echo "Testing backend-api-public..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public1 php artisan test --stop-on-failure
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --stop-on-failure
 
           echo "✅ All integration tests passed!"
 
