@@ -166,9 +166,8 @@ jobs:
       - name: Debug container files
         run: |
           cd docker/dev
-          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /
-          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /app || true
-
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user ls -la /app || true
 
       # Step 4: Setup Laravel applications
       - name: Setup Laravel Applications
