@@ -1,0 +1,24 @@
+{
+    frankenphp {
+        worker {
+            file /app/public/index.php
+            num 4
+            watch /app/**/*.php
+        }
+    }
+}
+
+:80 {
+    root * /app/public
+    encode zstd br gzip
+    php_server
+
+    # Laravel Reverb WebSocket route
+    @reverb_ws path /reverb
+    reverse_proxy @reverb_ws unix//run/php.sock
+
+    # Akses ke semua rute lainnya (default Laravel handling)
+    route {
+        try_files {path} /index.php
+    }
+}

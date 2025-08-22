@@ -1,0 +1,469 @@
+# .github/workflows/ci-cd.yml
+name: CI/CD Pipeline
+
+on:
+  # CI: Integration Testing (Pull Request ke main)
+  pull_request:
+    branches: [ main ]
+
+  # CD: Deploy (Push ke dev branch)
+  push:
+    branches: [ dev ]
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  # ===========================
+  # JOB 1: INTEGRATION TESTING
+  # Jalan cuma pas Pull Request ke main
+  # ===========================
+  integration-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Step 1: Generate shared secrets untuk semua container
+      - name: Generate Shared Environment Variables
+        run: |
+          echo "🔧 Generating shared environment variables..."
+
+          # Generate APP_KEY (Laravel format)
+          APP_KEY="base64:$(openssl rand -base64 32)"
+          echo "Generated APP_KEY: $APP_KEY"
+
+          # Generate JWT_SECRET (untuk semua container)
+          JWT_SECRET=$(openssl rand -base64 64)
+          echo "Generated JWT_SECRET: $JWT_SECRET"
+
+          # Generate REVERB secrets (untuk user & forum)
+          REVERB_APP_ID="ci-$(date +%s)"
+          REVERB_APP_KEY="ci-key-$(openssl rand -hex 8)"  
+          REVERB_APP_SECRET="ci-secret-$(openssl rand -base64 32)"
+
+          # Save ke environment variables untuk step berikutnya
+          echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
+          echo "JWT_SECRET=$JWT_SECRET" >> $GITHUB_ENV
+          echo "REVERB_APP_ID=$REVERB_APP_ID" >> $GITHUB_ENV
+          echo "REVERB_APP_KEY=$REVERB_APP_KEY" >> $GITHUB_ENV
+          echo "REVERB_APP_SECRET=$REVERB_APP_SECRET" >> $GITHUB_ENV
+
+      # Step 2: Create environment files dengan generated secrets
+      - name: Create Environment Files
+        run: |
+          echo "📝 Creating environment files with generated secrets..."
+          cd docker/dev
+
+          # Shared environment untuk semua backend
+          mkdir -p backend-laravel/_shared
+          cat > backend-laravel/_shared/.env.shared << EOF
+          APP_NAME=iamra.course
+          APP_ENV=local
+          APP_DEBUG=true
+          APP_TIMEZONE=Asia/Jakarta
+          APP_KEY=$APP_KEY
+          
+          BCRYPT_ROUNDS=10
+          PHP_CLI_SERVER_WORKERS=4
+
+          DB_CONNECTION=mysql
+          DB_HOST=database-mysql
+          DB_PORT=3306
+          DB_DATABASE=iamra_course_test
+          DB_USERNAME=root
+          DB_PASSWORD=root
+          
+          DB_CONNECTION_SECOND=mongodb
+          DB_HOST_SECOND=database-mongo
+          DB_PORT_SECOND=27017
+          DB_DATABASE_SECOND=iamra_course
+          DB_USERNAME_SECOND=
+          DB_PASSWORD_SECOND=
+          DB_AUTHENTICATION_DATABASE_SECOND=iamra
+          
+          SESSION_DRIVER=redis
+          SESSION_LIFETIME=120
+          SESSION_ENCRYPT=false
+          SESSION_PATH=/
+          SESSION_DOMAIN=null
+          
+          QUEUE_CONNECTION=redis
+          
+          CACHE_DRIVER=redis
+          CACHE_STORE=redis
+          CACHE_PREFIX=
+
+          REDIS_CLIENT=phpredis
+          REDIS_HOST=database-redis
+          REDIS_PASSWORD=null
+          REDIS_PORT=6379
+          REDIS_PREFIX=
+
+          # JWT Secret yang sama untuk semua container
+          JWT_SECRET=$JWT_SECRET
+          JWT_TTL=1440
+          
+          EOF
+
+          # Backend API User (punya REVERB)
+          cat > ../../backend-api-user/.env << EOF
+
+          # REVERB Configuration (WebSocket)
+          BROADCAST_CONNECTION=reverb
+          REVERB_APP_ID=$REVERB_APP_ID
+          REVERB_APP_KEY=$REVERB_APP_KEY
+          REVERB_APP_SECRET=$REVERB_APP_SECRET
+          REVERB_HOST=backend-api-user
+          REVERB_PORT=8080
+          REVERB_SCHEME=http
+          EOF
+
+          # Backend API Forum (punya REVERB)
+          cat > ../../backend-api-forum/.env << EOF
+          APP_NAME="Forum API CI"
+          APP_URL=http://backend-api-forum:8000
+          USER_API_URL=http://backend-api-user:8000
+
+          # REVERB Configuration (WebSocket)  
+          BROADCAST_CONNECTION=reverb
+          REVERB_APP_ID=$REVERB_APP_ID
+          REVERB_APP_KEY=$REVERB_APP_KEY
+          REVERB_APP_SECRET=$REVERB_APP_SECRET
+          REVERB_HOST=backend-api-forum
+          REVERB_PORT=8080
+          REVERB_SCHEME=http
+          EOF
+
+          echo "✅ All environment files created with shared secrets!"
+
+      # Step 3: Start Docker dengan environment files yang udah dibuat
+      - name: Start Docker Services
+        run: |
+          cd docker/dev
+
+          echo "🚀 Starting Docker services..."
+
+          # Start databases dulu
+          sudo docker-compose -f docker-compose.ci.yaml up -d database-mysql database-redis database-mongo
+          echo "⏳ Waiting for databases..."
+          sleep 45
+
+          # Start user API dulu (most important)
+          sudo docker-compose -f docker-compose.ci.yaml up -d backend-api-user
+          echo "⏳ Waiting for user API..."
+          sleep 30
+
+          # Start services yang depend ke user API
+          sudo docker-compose -f docker-compose.ci.yaml up -d backend-api-student backend-api-instructor backend-api-forum backend-api-public1
+          echo "⏳ Waiting for all APIs..."
+          sleep 45
+
+          # Check if all containers are running
+          sudo docker-compose -f docker-compose.ci.yaml ps
+
+      # Step 4: Setup Laravel applications
+      - name: Setup Laravel Applications
+        run: |
+          cd docker/dev
+
+          echo "⚙️ Setting up Laravel applications..."
+
+          # Setup user API dulu (karena yang lain depend ke ini)
+          echo "Setting up backend-api-user..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user composer install --no-interaction
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan config:cache
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:cache
+
+          echo "⏳ Waiting after user setup..."
+          sleep 15
+
+          # Setup other APIs
+          for service in student instructor forum public; do
+            echo "Setting up backend-api-$service..."
+            sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
+            sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan migrate:fresh --seed --force
+            sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
+            sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
+          done
+
+          echo "✅ All Laravel applications setup completed!"
+
+      # Step 5: Run Integration Tests
+      - name: Run Integration Tests
+        run: |
+          cd docker/dev
+
+          echo "🧪 Running integration tests..."
+
+          # Test dalam urutan dependency
+          echo "Testing backend-api-user (base service)..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --stop-on-failure
+
+          echo "Testing backend-api-student..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-student php artisan test --stop-on-failure
+
+          echo "Testing backend-api-instructor..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --stop-on-failure
+
+          echo "Testing backend-api-forum..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --stop-on-failure
+
+          echo "Testing backend-api-public..."
+          sudo docker-compose -f docker-compose.ci.yaml exec -T backend-api-public1 php artisan test --stop-on-failure
+
+          echo "✅ All integration tests passed!"
+
+      # Step 6: Cleanup
+      - name: Cleanup Docker
+        if: always()
+        run: |
+          cd docker/dev
+          sudo docker-compose -f docker-compose.ci.yaml down -v --remove-orphans
+          sudo docker system prune -f
+
+  # ===========================
+  # JOB 2: BUILD & DEPLOY
+  # Jalan cuma pas push ke dev branch
+  # ===========================
+#  deploy:
+#    name: Build and Deploy to AWS
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+#
+#    steps:
+#      - name: Checkout Code
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '18'
+#
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v4
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: ${{ env.AWS_REGION }}
+#
+#      # Build React Applications untuk Production
+#      - name: Build React Applications
+#        run: |
+#          echo "🏗️ Building React applications for production..."
+#
+#          for frontend in user instructor student public forum; do
+#            if [ -d "frontend-$frontend" ] && [ -f "frontend-$frontend/package.json" ]; then
+#              echo "Building frontend-$frontend..."
+#              cd frontend-$frontend
+#
+#              # Create production environment file kalau ada
+#              if [ -f "../.env.prod" ]; then
+#                cp ../.env.prod .env.production
+#              fi
+#
+#              npm ci --only=production
+#              npm run build
+#
+#              # Verify build success
+#              if [ ! -d "build" ]; then
+#                echo "❌ Build failed for frontend-$frontend"
+#                exit 1
+#              fi
+#
+#              echo "✅ frontend-$frontend build completed"
+#              cd ..
+#            else
+#              echo "⚠️ frontend-$frontend not found or no package.json"
+#            fi
+#          done
+#
+#      # Prepare Laravel Applications
+#      - name: Prepare Laravel Applications
+#        run: |
+#          echo "📦 Preparing Laravel applications..."
+#
+#          for service in user student instructor forum public; do
+#            if [ -d "backend-api-$service" ]; then
+#              echo "Preparing backend-api-$service..."
+#              cd backend-api-$service
+#
+#              # Install production dependencies
+#              if [ -f "composer.json" ]; then
+#                composer install --no-dev --optimize-autoloader --no-interaction
+#              fi
+#
+#              echo "✅ backend-api-$service prepared"
+#              cd ..
+#            else
+#              echo "⚠️ backend-api-$service not found"
+#            fi
+#          done
+#
+#      # Create Deployment Package
+#      - name: Create Deployment Package
+#        run: |
+#          echo "📦 Creating deployment package..."
+#
+#          # Create deploy directory
+#          mkdir -p deploy
+#
+#          # Copy frontend builds
+#          for frontend in user instructor student public forum; do
+#            if [ -d "frontend-$frontend/build" ]; then
+#              mkdir -p deploy/frontend-$frontend
+#              cp -r frontend-$frontend/build/* deploy/frontend-$frontend/
+#              echo "✅ Copied frontend-$frontend build files"
+#            fi
+#          done
+#
+#          # Copy backend source (without vendor, node_modules)
+#          for service in user student instructor forum public; do
+#            if [ -d "backend-api-$service" ]; then
+#              mkdir -p deploy/backend-api-$service
+#              rsync -av --exclude='vendor' --exclude='node_modules' \
+#                --exclude='.git' --exclude='storage/logs/*' \
+#                backend-api-$service/ deploy/backend-api-$service/
+#              echo "✅ Copied backend-api-$service source"
+#            fi
+#          done
+#
+#          # Copy Docker configuration
+#          cp -r docker deploy/
+#
+#          # Create production environment file
+#          cat > deploy/.env << 'EOF'
+#          APP_ENV=production
+#          APP_DEBUG=false
+#          DB_CONNECTION=mysql
+#          DB_HOST=mysql
+#          DB_PORT=3306
+#          DB_DATABASE=olcourse
+#          DB_USERNAME=${DB_USERNAME}
+#          DB_PASSWORD=${DB_PASSWORD}
+#          REDIS_HOST=redis
+#          REDIS_PORT=6379
+#          EOF
+#
+#          # Create deployment script
+#          cat > deploy/deploy.sh << 'EOF'
+#          #!/bin/bash
+#          set -e
+#
+#          echo "🚀 Starting deployment to production..."
+#
+#          # Install Docker if not present
+#          if ! command -v docker &> /dev/null; then
+#            echo "Installing Docker..."
+#            curl -fsSL https://get.docker.com -o get-docker.sh
+#            sh get-docker.sh
+#            sudo usermod -aG docker $USER
+#            newgrp docker
+#          fi
+#
+#          # Install Docker Compose if not present
+#          if ! command -v docker-compose &> /dev/null; then
+#            echo "Installing Docker Compose..."
+#            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+#              -o /usr/local/bin/docker-compose
+#            sudo chmod +x /usr/local/bin/docker-compose
+#          fi
+#
+#          # Stop existing services gracefully
+#          echo "Stopping existing services..."
+#          docker-compose -f docker/prod/docker-compose.yaml down || true
+#
+#          # Clean up old images (optional)
+#          docker image prune -f || true
+#
+#          # Start new services
+#          echo "Starting new services..."
+#          docker-compose -f docker/prod/docker-compose.yaml up -d --build
+#
+#          # Wait for database to be ready
+#          echo "Waiting for database to be ready..."
+#          sleep 60
+#
+#          # Run Laravel setup for each service
+#          for service in user student instructor forum public; do
+#            echo "Setting up backend-api-$service..."
+#
+#            # Install composer dependencies in container
+#            docker-compose -f docker/prod/docker-compose.yaml exec backend-api-$service \
+#              composer install --no-dev --optimize-autoloader --no-interaction
+#
+#            # Run migrations
+#            docker-compose -f docker/prod/docker-compose.yaml exec backend-api-$service \
+#              php artisan migrate --force
+#
+#            # Cache optimization
+#            docker-compose -f docker/prod/docker-compose.yaml exec backend-api-$service \
+#              php artisan config:cache
+#            docker-compose -f docker/prod/docker-compose.yaml exec backend-api-$service \
+#              php artisan route:cache
+#            docker-compose -f docker/prod/docker-compose.yaml exec backend-api-$service \
+#              php artisan view:cache
+#
+#            echo "✅ backend-api-$service setup completed"
+#          done
+#
+#          echo "🎉 Deployment completed successfully!"
+#
+#          # Show running services
+#          docker-compose -f docker/prod/docker-compose.yaml ps
+#          EOF
+#
+#          chmod +x deploy/deploy.sh
+#
+#          # Create deployment archive
+#          tar -czf deployment.tar.gz deploy/
+#
+#          echo "✅ Deployment package created: deployment.tar.gz"
+#
+#      # Deploy to EC2
+#      - name: Deploy to EC2
+#        env:
+#          EC2_HOST: ${{ secrets.EC2_HOST }}
+#          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+#          EC2_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+#        run: |
+#          echo "🚀 Deploying to EC2..."
+#
+#          # Save private key
+#          echo "$EC2_PRIVATE_KEY" > private_key.pem
+#          chmod 600 private_key.pem
+#
+#          # Upload deployment package
+#          echo "📤 Uploading deployment package..."
+#          scp -i private_key.pem -o StrictHostKeyChecking=no \
+#            deployment.tar.gz $EC2_USERNAME@$EC2_HOST:~/
+#
+#          # Execute deployment on EC2
+#          echo "🔧 Executing deployment on EC2..."
+#          ssh -i private_key.pem -o StrictHostKeyChecking=no \
+#            $EC2_USERNAME@$EC2_HOST << 'EOF'
+#
+#            # Extract deployment package
+#            echo "📦 Extracting deployment package..."
+#            tar -xzf deployment.tar.gz
+#
+#            # Set environment variables
+#            export DB_USERNAME="olcourse_user"
+#            export DB_PASSWORD="${DB_PASSWORD}"
+#
+#            # Run deployment
+#            cd deploy
+#            ./deploy.sh
+#
+#            # Cleanup
+#            cd ..
+#            rm -rf deploy deployment.tar.gz
+#
+#            echo "✅ Deployment completed on EC2"
+#          EOF
+#
+#          # Cleanup local files
+#          rm private_key.pem
+#
+#          echo "🎉 Deployment to AWS completed successfully!"

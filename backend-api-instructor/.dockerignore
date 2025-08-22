@@ -1,0 +1,31 @@
+# Dependency & cache
+vendor
+
+# Environment & config lokal
+.env
+.env.*.local
+
+# Logs & cache
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+bootstrap/cache/*.php
+
+# Test & dev files
+.phpunit.result.cache
+phpunit.xml
+/tests
+
+# VCS & editor
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+.editorconfig
+
+# System files
+.DS_Store
+Thumbs.db
+README.md

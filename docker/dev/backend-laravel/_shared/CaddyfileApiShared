@@ -1,0 +1,25 @@
+{
+    frankenphp {
+        worker {
+            file /app/public/index.php
+            num 4
+            watch /app/**/*.php
+        }
+    }
+}
+
+:80 {
+    root * /app/public
+    encode zstd br gzip
+    php_server
+
+    @blockedFiles {
+        path /.env*
+        path /app/*
+        path /routes/*
+        path /storage/*
+        path /vendor/*
+    }
+
+    respond @blockedFiles 403
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "first_name": "Ilham",
+    "middle_name": "Rahmat",
+    "last_name": "Akbar",
+    "username": "ilhamrhmtkbr",
+    "password": "Ilham123!",
+    "password_confirmation": "Ilham123!"
+  },
+  {
+    "first_name": "Sari",
+    "middle_name": "Dewi",
+    "last_name": "Pertiwi",
+    "username": "saridwprtwi",
+    "password": "Sari456@",
+    "password_confirmation": "Sari456@"
+  },
+  {
+    "first_name": "Budi",
+    "middle_name": "Santoso",
+    "last_name": "Wijaya",
+    "username": "budisntswjy",
+    "password": "Budi789#",
+    "password_confirmation": "Budi789#"
+  },
+  {
+    "first_name": "Rina",
+    "middle_name": "Sari",
+    "last_name": "Lestari",
+    "username": "rinasrlstr",
+    "password": "Rina321$",
+    "password_confirmation": "Rina321$"
+  },
+  {
+    "first_name": "Ahmad",
+    "middle_name": "Fauzi",
+    "last_name": "Rahman",
+    "username": "ahmdffzrhm",
+    "password": "Ahmad654%",
+    "password_confirmation": "Ahmad654%"
+  },
+  {
+    "first_name": "Maya",
+    "middle_name": "Indira",
+    "last_name": "Sari",
+    "username": "myindrsri",
+    "password": "Maya987&",
+    "password_confirmation": "Maya987&"
+  },
+  {
+    "first_name": "Rizki",
+    "middle_name": "Fadli",
+    "last_name": "Hakim",
+    "username": "rizkifdhkm",
+    "password": "Rizki147*",
+    "password_confirmation": "Rizki147*"
+  },
+  {
+    "first_name": "Ayu",
+    "middle_name": "Kartika",
+    "last_name": "Putri",
+    "username": "ayukrtkptr",
+    "password": "Ayu258+",
+    "password_confirmation": "Ayu258+"
+  },
+  {
+    "first_name": "Doni",
+    "middle_name": "Prasetyo",
+    "last_name": "Hadi",
+    "username": "doniprsthd",
+    "password": "Doni369=",
+    "password_confirmation": "Doni369="
+  },
+  {
+    "first_name": "Lina",
+    "middle_name": "Widya",
+    "last_name": "Ningrum",
+    "username": "linawdyngr",
+    "password": "Lina741!",
+    "password_confirmation": "Lina741!"
+  },
+  {
+    "first_name": "Hendra",
+    "middle_name": "Gunawan",
+    "last_name": "Saputra",
+    "username": "hndrgnsptr",
+    "password": "Hendra852@",
+    "password_confirmation": "Hendra852@"
+  },
+  {
+    "first_name": "Fitri",
+    "middle_name": "Amelia",
+    "last_name": "Wati",
+    "username": "fitrimlwt",
+    "password": "Fitri963#",
+    "password_confirmation": "Fitri963#"
+  },
+  {
+    "first_name": "Andi",
+    "middle_name": "Kurniawan",
+    "last_name": "Putra",
+    "username": "andikrnptr",
+    "password": "Andi074$",
+    "password_confirmation": "Andi074$"
+  },
+  {
+    "first_name": "Novi",
+    "middle_name": "Rahayu",
+    "last_name": "Sari",
+    "username": "novirhysri",
+    "password": "Novi185%",
+    "password_confirmation": "Novi185%"
+  },
+  {
+    "first_name": "Toni",
+    "middle_name": "Hermawan",
+    "last_name": "Pratama",
+    "username": "tonihrmprm",
+    "password": "Toni296&",
+    "password_confirmation": "Toni296&"
+  },
+  {
+    "first_name": "Sinta",
+    "middle_name": "Permata",
+    "last_name": "Sari",
+    "username": "sintaprmsri",
+    "password": "Sinta307*",
+    "password_confirmation": "Sinta307*"
+  },
+  {
+    "first_name": "Rudi",
+    "middle_name": "Setiawan",
+    "last_name": "Jaya",
+    "username": "rudistjy",
+    "password": "Rudi418+",
+    "password_confirmation": "Rudi418+"
+  },
+  {
+    "first_name": "Dewi",
+    "middle_name": "Ratna",
+    "last_name": "Sari",
+    "username": "dewirtnsri",
+    "password": "Dewi529=",
+    "password_confirmation": "Dewi529="
+  },
+  {
+    "first_name": "Irfan",
+    "middle_name": "Maulana",
+    "last_name": "Putra",
+    "username": "irfanmlnptr",
+    "password": "Irfan630!",
+    "password_confirmation": "Irfan630!"
+  },
+  {
+    "first_name": "Wulan",
+    "middle_name": "Cahya",
+    "last_name": "Ningrum",
+    "username": "wulanchyngr",
+    "password": "Wulan741@",
+    "password_confirmation": "Wulan741@"
+  },
+  {
+    "first_name": "Fajar",
+    "middle_name": "Sidiq",
+    "last_name": "Ramadhan",
+    "username": "fajarsdrmdh",
+    "password": "Fajar852#",
+    "password_confirmation": "Fajar852#"
+  },
+  {
+    "first_name": "Intan",
+    "middle_name": "Kusuma",
+    "last_name": "Wardani",
+    "username": "intanksmwrd",
+    "password": "Intan963$",
+    "password_confirmation": "Intan963$"
+  },
+  {
+    "first_name": "Bayu",
+    "middle_name": "Anggara",
+    "last_name": "Putra",
+    "username": "bayuanggptr",
+    "password": "Bayu074%",
+    "password_confirmation": "Bayu074%"
+  },
+  {
+    "first_name": "Lia",
+    "middle_name": "Maharani",
+    "last_name": "Putri",
+    "username": "liamhrnptr",
+    "password": "Lia185&",
+    "password_confirmation": "Lia185&"
+  },
+  {
+    "first_name": "Arif",
+    "middle_name": "Budiman",
+    "last_name": "Wijaya",
+    "username": "arifbdmwjy",
+    "password": "Arif296*",
+    "password_confirmation": "Arif296*"
+  }
+]
