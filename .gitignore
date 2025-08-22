@@ -13,7 +13,6 @@
 # Laravel Dependencies & Cache
 **/backend-api-*/vendor/
 **/backend-api-*/node_modules/
-**/backend-api-*/storage/app/*
 **/backend-api-*/storage/framework/cache/*
 **/backend-api-*/storage/framework/sessions/*
 **/backend-api-*/storage/framework/views/*
