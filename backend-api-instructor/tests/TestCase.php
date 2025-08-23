@@ -17,7 +17,7 @@ abstract class TestCase extends BaseTestCase
         Repository::insertInstructor();
         Repository::insertStudent();
         $this->url = config('api.version');
-        $res = Http::post('http://backend-api-user/user-api/v1/auth/login', [
+        $res = Http::post('http://backend-api-user/' . $this->url . '/v1/auth/login', [
             'username' => Repository::INSTRUCTOR_USERNAME,
             'password' => Repository::INSTRUCTOR_PASSWORD
         ]);

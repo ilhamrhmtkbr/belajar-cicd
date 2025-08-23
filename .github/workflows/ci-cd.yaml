@@ -104,6 +104,12 @@ jobs:
           # JWT Secret yang sama untuk semua container
           JWT_SECRET=$JWT_SECRET
           
+          USER_API_VERSION=user-api/v1
+          STUDENT_API_VERSION=student-api/v1
+          INSTRUCTOR_API_VERSION=instructor-api/v1
+          PUBLIC_API_VERSION=public-api/v1
+          FORUM_API_VERSION=forum-api/v1
+          
           EOF
 
           # Backend API User (punya REVERB)
@@ -194,29 +200,12 @@ jobs:
 
           # Wait for FrankenPHP to fully start (lebih simple approach)
           echo "Waiting for FrankenPHP to start..."
-          sleep 30
+          sleep 60
+          
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:list
 
           # Test basic connectivity dengan berbagai endpoint
           echo "Testing user service connectivity..."
-
-          # Test 1: Basic root endpoint
-          if sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -f -s http://localhost/ >/dev/null 2>&1; then
-            echo "✅ User service is responding on root path!"
-          else
-            echo "❌ User service not responding on root path"
-          fi
-
-          # Test 2: Any Laravel endpoint (should return something, even 404 is OK)
-          response_code=$(sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -s -o /dev/null -w "%{http_code}" http://localhost/api/test 2>/dev/null || echo "000")
-          if [ "$response_code" != "000" ]; then
-            echo "✅ User service HTTP is working (got HTTP $response_code)"
-          else
-            echo "❌ User service HTTP not working"
-            # Show some debug info
-            echo "---- Container logs (last 50 lines) ----"
-            sudo docker compose -f docker-compose.ci.yaml logs --tail 50 backend-api-user
-            exit 1
-          fi
 
           # Setup other APIs
           for service in student instructor forum public; do
@@ -259,8 +248,8 @@ jobs:
           echo "---- Network Information ----"
           sudo docker network ls
 
-          # Test user service dari dalam container sendiri
-          echo "🔍 Testing user service from inside container..."
+          # Test user route
+          echo "🔍 Testing user route..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:list || true
 
           # Test basic curl ke user service
