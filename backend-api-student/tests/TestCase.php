@@ -4,6 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\utils\Repository;
 
 abstract class TestCase extends BaseTestCase
@@ -23,7 +24,8 @@ abstract class TestCase extends BaseTestCase
         $cookies = $res->header('Set-Cookie');
         preg_match('/access_token=([^;]+)/', $cookies, $matches);
         $this->token = $matches[1] ?? null;
-        $res->dump();
+        Log::info($res->json());
+        Log::info($res->header('Set-Cookie'));
     }
 
     protected function tearDown(): void

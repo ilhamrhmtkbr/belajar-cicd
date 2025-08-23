@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Tests\utils\Repository;
 
-class QuestionsTest extends TestCase
+class Questions extends TestCase
 {
     function test_student_berhasil_mendapatkan_data_questions()
     {
