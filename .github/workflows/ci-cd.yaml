@@ -176,7 +176,7 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:cache
 
           echo "⏳ Waiting after user setup..."
-          sleep 15
+          sleep 90
 
           # Setup other APIs
           for service in student instructor forum public; do
@@ -192,6 +192,28 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan migrate:fresh --seed
 
           echo "✅ All Laravel applications setup completed!"
+
+      # Step 5: Debug Login Before Tests
+      - name: Debug Login Response
+        run: |
+          cd docker/dev
+          echo "🔍 Testing login endpoint..."
+          
+          # Test login endpoint manually
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -v \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{"username":"student","password":"password"}' \
+            http://localhost/user-api/v1/auth/login || true
+          
+          echo "🔍 Testing internal login endpoint..."
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student curl -v \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -d '{"username":"student","password":"password"}' \
+            http://backend-api-user/user-api/v1/auth/login || true
 
       # Step 5: Run Integration Tests
       - name: Run Integration Tests
@@ -222,8 +244,18 @@ jobs:
         if: failure()
         run: |
           cd docker/dev
+
+          echo "---- Docker container status ----"
+          sudo docker compose -f docker-compose.ci.yaml ps
+
+          echo "---- backend-api-user logs ----"
+          sudo docker compose -f docker-compose.ci.yaml logs backend-api-user || true
+
           echo "---- backend-api-student laravel.log ----"
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student cat storage/logs/laravel.log || true
+
+          echo "---- backend-api-user laravel.log ----"
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user cat storage/logs/laravel.log || true
 
       # Step 6: Cleanup
       - name: Cleanup Docker
