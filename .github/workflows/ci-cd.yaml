@@ -169,7 +169,6 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml ps
 
       # Step 4: Setup Laravel applications
-      # Step 4: Setup Laravel applications
       - name: Setup Laravel Applications
         run: |
           cd docker/dev

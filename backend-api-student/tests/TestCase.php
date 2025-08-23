@@ -17,14 +17,47 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         Repository::initData();
         $this->url = config('api.version');
-        $res = Http::post('http://backend-api-user/'. $this->url .'/auth/login', [
-            'username' => Repository::USERNAME,
-            'password' => Repository::PASSWORD
-        ]);
-        $cookies = $res->header('Set-Cookie');
-        preg_match('/access_token=([^;]+)/', $cookies, $matches);
-        $this->token = $matches[1] ?? null;
-        Log::info($res->json());
+
+        try {
+            // Tambahkan headers yang diperlukan
+            $res = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post('http://backend-api-user' . $this->url . '/auth/login', [
+                'username' => Repository::USERNAME,
+                'password' => Repository::PASSWORD
+            ]);
+
+            Log::info('Login Response:', [
+                'status' => $res->status(),
+                'body' => $res->json(),
+                'headers' => $res->headers()
+            ]);
+
+            if ($res->successful()) {
+                $cookies = $res->header('Set-Cookie');
+                if (is_array($cookies)) {
+                    $cookies = implode('; ', $cookies);
+                }
+
+                preg_match('/access_token=([^;]+)/', $cookies, $matches);
+                $this->token = $matches[1] ?? null;
+
+                if (!$this->token) {
+                    Log::error('Token not found in cookies', ['cookies' => $cookies]);
+                }
+            } else {
+                Log::error('Login failed', [
+                    'status' => $res->status(),
+                    'response' => $res->json()
+                ]);
+                $this->token = null;
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Login exception', ['error' => $e->getMessage()]);
+            $this->token = null;
+        }
     }
 
     protected function tearDown(): void
