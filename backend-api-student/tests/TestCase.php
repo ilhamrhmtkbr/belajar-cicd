@@ -9,7 +9,7 @@ use Tests\utils\Repository;
 
 abstract class TestCase extends BaseTestCase
 {
-    public string $token;
+    public ?string $token;
     public string $url;
 
     protected function setUp(): void
@@ -25,7 +25,6 @@ abstract class TestCase extends BaseTestCase
         preg_match('/access_token=([^;]+)/', $cookies, $matches);
         $this->token = $matches[1] ?? null;
         Log::info($res->json());
-        Log::info($res->header('Set-Cookie'));
     }
 
     protected function tearDown(): void

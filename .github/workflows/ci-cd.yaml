@@ -282,6 +282,8 @@ jobs:
           # echo "Testing backend-api-public..."
           # sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
 
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student cat storage/logs/laravel.log || true
+
           echo "✅ All integration tests passed!"
 
       - name: Show All Logs
@@ -292,11 +294,8 @@ jobs:
           echo "---- Docker container status ----"
           sudo docker compose -f docker-compose.ci.yaml ps
 
-          echo "---- backend-api-user logs ----"
-          sudo docker compose -f docker-compose.ci.yaml logs backend-api-user || true
-
           echo "---- backend-api-student laravel.log ----"
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student cat storage/logs/laravel.log || true
+          sudo docker compose -f docker-compose.ci.yaml logs backend-api-student || true
 
       # Step 6: Cleanup
       - name: Cleanup Docker
