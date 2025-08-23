@@ -23,6 +23,9 @@ abstract class TestCase extends BaseTestCase
         $cookies = $res->header('Set-Cookie');
         preg_match('/access_token=([^;]+)/', $cookies, $matches);
         $this->token = $matches[1] ?? null;
+        fwrite(STDERR, "Cookies: " . $cookies . PHP_EOL);
+        fwrite(STDERR, "Matches: " . json_encode($matches) . PHP_EOL);
+
     }
 
     protected function tearDown(): void

@@ -202,8 +202,6 @@ jobs:
           echo "Waiting for FrankenPHP to start..."
           sleep 60
           
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:list
-
           # Test basic connectivity dengan berbagai endpoint
           echo "Testing user service connectivity..."
 
@@ -252,44 +250,14 @@ jobs:
           echo "🔍 Testing user route..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:list || true
 
-          # Test basic curl ke user service
-          echo "🔍 Testing basic endpoints..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -v http://localhost/ || true
-
-          # Test login endpoint dengan berbagai cara
-          echo "🔍 Testing login endpoints..."
-
-          # 1. Test dari container user sendiri
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -v \
-            -X POST \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{"username":"student","password":"password"}' \
-            http://localhost/user-api/v1/auth/login || true
-
-          # 2. Test dari container student ke user
+          # Test login endpoint
+          echo "🔍 Test dari container student ke user..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student curl -v \
             -X POST \
             -H "Content-Type: application/json" \
             -H "Accept: application/json" \
             -d '{"username":"student","password":"password"}' \
             http://backend-api-user/user-api/v1/auth/login || true
-
-          # 3. Test alternatif endpoint tanpa prefix
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user curl -v \
-            -X POST \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{"username":"student","password":"password"}' \
-            http://localhost/api/auth/login || true
-
-          # 4. Test ke port yang mungkin berbeda
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student curl -v \
-            -X POST \
-            -H "Content-Type: application/json" \
-            -H "Accept: application/json" \
-            -d '{"username":"student","password":"password"}' \
-            http://backend-api-user:8000/user-api/v1/auth/login || true
 
       # Step 6: Run Integration Tests
       - name: Run Integration Tests
