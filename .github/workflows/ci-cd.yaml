@@ -173,9 +173,6 @@ jobs:
           echo "Setting up backend-api-user..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user composer install --no-interaction
           
-          # Setup database dan seed untuk user service PERTAMA
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan migrate:fresh --seed
-          
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan config:cache
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:cache
           
@@ -183,6 +180,21 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user mkdir -p storage/logs
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user touch storage/logs/laravel.log
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user chmod -R 777 storage/logs
+          
+          
+          # Setup other APIs
+          for service in student instructor forum public; do
+            echo "Setting up backend-api-$service..."
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service mkdir -p storage/logs
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service touch storage/logs/laravel.log
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service chmod -R 777 storage/logs
+          done
+          
+          # Migrate untuk public service (atau sesuai kebutuhan)
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan migrate:fresh --seed
           
           echo "⏳ Waiting for user service to be ready..."
           # Health check yang lebih robust
@@ -217,20 +229,6 @@ jobs:
           
             sleep 5
           done
-          
-          # Setup other APIs
-          for service in student instructor forum public; do
-            echo "Setting up backend-api-$service..."
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service mkdir -p storage/logs
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service touch storage/logs/laravel.log
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service chmod -R 777 storage/logs
-          done
-          
-          # Migrate untuk public service (atau sesuai kebutuhan)
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan migrate:fresh --seed
           
           echo "✅ All Laravel applications setup completed!"
 
