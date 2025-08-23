@@ -23,7 +23,7 @@ abstract class TestCase extends BaseTestCase
             $res = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post('http://backend-api-user' . $this->url . '/auth/login', [
+            ])->post('http://backend-api-user/' . $this->url . '/auth/login', [
                 'username' => Repository::USERNAME,
                 'password' => Repository::PASSWORD
             ]);
