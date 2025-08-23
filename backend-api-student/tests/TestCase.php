@@ -40,46 +40,78 @@ abstract class TestCase extends BaseTestCase
 
     private function performLogin(): void
     {
-        $loginUrl = 'http://backend-api-user/user-api/v1/auth/login';
+        // List of possible login URLs to try
+        $loginUrls = [
+            'http://backend-api-user/user-api/v1/auth/login',
+            'http://backend-api-user/api/v1/auth/login',
+            'http://backend-api-user/api/auth/login',
+            'http://backend-api-user:8000/user-api/v1/auth/login',
+            'http://backend-api-user:8000/api/auth/login',
+        ];
 
-        try {
-            $res = Http::timeout(30)->post($loginUrl, [
-                'username' => Repository::USERNAME,
-                'password' => Repository::PASSWORD
-            ]);
+        $lastException = null;
 
-            // Debug response
-            echo "Login response status: " . $res->status() . "\n";
-            echo "Login response headers: " . json_encode($res->headers()) . "\n";
-            echo "Login response body: " . $res->body() . "\n";
+        foreach ($loginUrls as $loginUrl) {
+            try {
+                echo "Trying login URL: $loginUrl\n";
 
-            if (!$res->successful()) {
-                throw new \RuntimeException("Login request failed with status: " . $res->status() . ". Body: " . $res->body());
+                $res = Http::timeout(30)->post($loginUrl, [
+                    'username' => Repository::USERNAME,
+                    'password' => Repository::PASSWORD
+                ]);
+
+                // Debug response
+                echo "Login response status: " . $res->status() . "\n";
+                echo "Login response body: " . $res->body() . "\n";
+
+                if (!$res->successful()) {
+                    echo "❌ Login failed with status: " . $res->status() . "\n";
+                    continue; // Try next URL
+                }
+
+                // Try to get token from response body first
+                $responseData = $res->json();
+                if (isset($responseData['data']['access_token']) || isset($responseData['access_token'])) {
+                    $this->token = $responseData['data']['access_token'] ?? $responseData['access_token'];
+                    echo "✅ Token from response body: " . substr($this->token, 0, 20) . "...\n";
+                    return; // Success!
+                }
+
+                // Fallback to cookies
+                $cookies = $res->header('Set-Cookie');
+                if (!$cookies) {
+                    echo "❌ No token in response body and no cookies\n";
+                    continue; // Try next URL
+                }
+
+                if (is_array($cookies)) {
+                    $cookieString = implode('; ', $cookies);
+                } else {
+                    $cookieString = $cookies;
+                }
+
+                if (!preg_match('/access_token=([^;]+)/', $cookieString, $matches)) {
+                    echo "❌ No access_token in cookies: " . $cookieString . "\n";
+                    continue; // Try next URL
+                }
+
+                $this->token = $matches[1];
+                echo "✅ Token from cookies: " . substr($this->token, 0, 20) . "...\n";
+                return; // Success!
+
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                echo "❌ Connection failed to $loginUrl: " . $e->getMessage() . "\n";
+                $lastException = new \RuntimeException("Connection failed to login service: " . $e->getMessage());
+                continue; // Try next URL
+            } catch (\Exception $e) {
+                echo "❌ Error with $loginUrl: " . $e->getMessage() . "\n";
+                $lastException = $e;
+                continue; // Try next URL
             }
-
-            $cookies = $res->header('Set-Cookie');
-            if (!$cookies) {
-                throw new \RuntimeException("No cookies in login response. Response: " . $res->body());
-            }
-
-            if (is_array($cookies)) {
-                $cookieString = implode('; ', $cookies);
-            } else {
-                $cookieString = $cookies;
-            }
-
-            echo "Cookies received: " . $cookieString . "\n";
-
-            if (!preg_match('/access_token=([^;]+)/', $cookieString, $matches)) {
-                throw new \RuntimeException("Failed to get access_token from cookies: " . $cookieString . ". Response body: " . $res->body());
-            }
-
-            $this->token = $matches[1];
-            echo "Token extracted: " . substr($this->token, 0, 20) . "...\n";
-
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            throw new \RuntimeException("Connection failed to login service: " . $e->getMessage());
         }
+
+        // If we get here, all URLs failed
+        throw $lastException ?: new \RuntimeException("All login URLs failed");
     }
 
     protected function tearDown(): void
