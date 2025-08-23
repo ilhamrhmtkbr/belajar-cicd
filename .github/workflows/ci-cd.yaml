@@ -184,6 +184,9 @@ jobs:
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
             sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service mkdir -p storage/logs
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service touch storage/logs/laravel.log
+            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service chmod -R 777 storage/logs
           done
           
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan migrate:fresh --seed
