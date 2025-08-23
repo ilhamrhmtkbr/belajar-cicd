@@ -185,10 +185,6 @@ jobs:
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user touch storage/logs/laravel.log  
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user chmod -R 777 storage bootstrap/cache
 
-          # PENTING: Migrate DULU sebelum cache
-          echo "Running migrations for user service..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan migrate:fresh --seed
-
           # Baru kemudian cache (setelah database ready)
           echo "Caching config and routes for user service..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan config:cache
