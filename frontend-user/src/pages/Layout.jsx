@@ -65,51 +65,53 @@ export default function Layout() {
                     <Outlet/>
                 </section>
                 <aside className={'sidebar-menu'}>
-                    <div className="sidebar-menu-title sidebar-menu-item"
-                         onClick={() => setMinifySidebar(prevState => !prevState)}>
-                        <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
-                        <p>Menu</p>
-                    </div>
-
-                    <div className="sidebar-menu-element">
-                        <HashLink
-                            className={`sidebar-menu-item ${location.pathname.includes('additional-info') ? 'active' : ''}`}
-                            data-title={t('additional_info')} to="/member/additional-info#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'additional-info'}/>
-                            <p>{t('additional_info')}</p>
-                        </HashLink>
-                        <HashLink
-                            className={`sidebar-menu-item ${location.pathname.includes('authentication') ? 'active' : ''}`}
-                            data-title={t('authentication')} to="/member/authentication#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'authentication'}/>
-                            <p>{t('authentication')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname.includes('email') ? 'active' : ''}`}
-                                  data-title="Email" to="/member/email#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'email'}/>
-                            <p>{t('email')}</p>
-                        </HashLink>
-                        {user?.role !== 'user' && user.role === 'instructor' ?
-                            <a className={'sidebar-menu-item'} data-title={t('profile')}
-                               href={import.meta.env.VITE_APP_FRONTEND_INSTRUCTOR_URL}>
-                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
-                                <p>{t('profile')}</p>
-                            </a> :
-                            <a className={'sidebar-menu-item'} data-title={t('profile')}
-                               href={import.meta.env.VITE_APP_FRONTEND_STUDENT_URL}>
-                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
-                                <p>{t('profile')}</p>
-                            </a>
-                        }
-                        <div
-                            className={`sidebar-menu-item ${location.pathname.includes('role-register') ? 'active' : ''}`}
-                            data-title={t('role_register')} onClick={() => navToRoleRegister(user, t)}>
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'role-register'}/>
-                            <p>{t('role_register')}</p>
+                    <div className={'sidebar-menu-content'}>
+                        <div className="sidebar-menu-title sidebar-menu-item"
+                             onClick={() => setMinifySidebar(prevState => !prevState)}>
+                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
+                            <p>Menu</p>
                         </div>
-                        <div className={'sidebar-menu-item'} data-title={'Logout'} onClick={logout}>
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'logout'}/>
-                            <p>{t('logout')}</p>
+
+                        <div className="sidebar-menu-element">
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname.includes('additional-info') ? 'active' : ''}`}
+                                data-title={t('additional_info')} to="/member/additional-info#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'additional-info'}/>
+                                <p>{t('additional_info')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname.includes('authentication') ? 'active' : ''}`}
+                                data-title={t('authentication')} to="/member/authentication#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'authentication'}/>
+                                <p>{t('authentication')}</p>
+                            </HashLink>
+                            <HashLink className={`sidebar-menu-item ${location.pathname.includes('email') ? 'active' : ''}`}
+                                      data-title="Email" to="/member/email#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'email'}/>
+                                <p>{t('email')}</p>
+                            </HashLink>
+                            {user?.role !== 'user' && user.role === 'instructor' ?
+                                <a className={'sidebar-menu-item'} data-title={t('profile')}
+                                   href={import.meta.env.VITE_APP_FRONTEND_INSTRUCTOR_URL}>
+                                    <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
+                                    <p>{t('profile')}</p>
+                                </a> :
+                                <a className={'sidebar-menu-item'} data-title={t('profile')}
+                                   href={import.meta.env.VITE_APP_FRONTEND_STUDENT_URL}>
+                                    <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
+                                    <p>{t('profile')}</p>
+                                </a>
+                            }
+                            <div
+                                className={`sidebar-menu-item ${location.pathname.includes('role-register') ? 'active' : ''}`}
+                                data-title={t('role_register')} onClick={() => navToRoleRegister(user, t)}>
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'role-register'}/>
+                                <p>{t('role_register')}</p>
+                            </div>
+                            <div className={'sidebar-menu-item'} data-title={'Logout'} onClick={logout}>
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'logout'}/>
+                                <p>{t('logout')}</p>
+                            </div>
                         </div>
                     </div>
                 </aside>

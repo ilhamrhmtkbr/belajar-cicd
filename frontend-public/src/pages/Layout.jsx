@@ -88,54 +88,56 @@ export default function Layout() {
                     </section>
                 </Suspense>
                 <aside className={'sidebar-menu'}>
-                    <div className="sidebar-menu-title sidebar-menu-item"
-                         onClick={() => setMinifySidebar(prevState => !prevState)}>
-                        <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
-                        <p>Menu</p>
-                    </div>
-                    <div className="sidebar-menu-element">
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/' ? 'active' : ''}`}
-                                  data-title={t('courses')} to="/#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'courses'}/>
-                            <p>{t('courses')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/about' ? 'active' : ''}`}
-                                  data-title={t('about')} to="/about#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'about'}/>
-                            <p>{t('about')}</p>
-                        </HashLink>
-                        <HashLink
-                            className={`sidebar-menu-item ${location.pathname === '/certificates' ? 'active' : ''}`}
-                            data-title={t('certificates')} to="/certificates#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'certificates'}/>
-                            <p>{t('certificates')}</p>
-                        </HashLink>
-                        {user &&
-                            <>
-                                <a className={'sidebar-menu-item'} data-title={t('setting')}
-                                   href={import.meta.env.VITE_APP_FRONTEND_USER_URL + '/member/additional-info#top'}>
-                                    <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'setting'}/>
-                                    <p>{t('setting')}</p>
-                                </a>
-                                {user?.role === 'instructor' ?
-                                    <a className={'sidebar-menu-item'} data-title={t('profile')}
-                                       href={import.meta.env.VITE_APP_FRONTEND_INSTRUCTOR_URL}>
-                                        <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
-                                        <p>{t('profile')}</p>
-                                    </a> : user?.role === 'student' ?
+                    <div className={'sidebar-menu-content'}>
+                        <div className="sidebar-menu-title sidebar-menu-item"
+                             onClick={() => setMinifySidebar(prevState => !prevState)}>
+                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
+                            <p>Menu</p>
+                        </div>
+                        <div className="sidebar-menu-element">
+                            <HashLink className={`sidebar-menu-item ${location.pathname === '/' ? 'active' : ''}`}
+                                      data-title={t('courses')} to="/#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'courses'}/>
+                                <p>{t('courses')}</p>
+                            </HashLink>
+                            <HashLink className={`sidebar-menu-item ${location.pathname === '/about' ? 'active' : ''}`}
+                                      data-title={t('about')} to="/about#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'about'}/>
+                                <p>{t('about')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/certificates' ? 'active' : ''}`}
+                                data-title={t('certificates')} to="/certificates#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'certificates'}/>
+                                <p>{t('certificates')}</p>
+                            </HashLink>
+                            {user &&
+                                <>
+                                    <a className={'sidebar-menu-item'} data-title={t('setting')}
+                                       href={import.meta.env.VITE_APP_FRONTEND_USER_URL + '/member/additional-info#top'}>
+                                        <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'setting'}/>
+                                        <p>{t('setting')}</p>
+                                    </a>
+                                    {user?.role === 'instructor' ?
                                         <a className={'sidebar-menu-item'} data-title={t('profile')}
-                                           href={import.meta.env.VITE_APP_FRONTEND_STUDENT_URL}>
+                                           href={import.meta.env.VITE_APP_FRONTEND_INSTRUCTOR_URL}>
                                             <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
                                             <p>{t('profile')}</p>
-                                        </a> :
-                                        <a className={'sidebar-menu-item'} data-title={t('profile')}
-                                           href={import.meta.env.VITE_APP_FRONTEND_USER_URL + 'authentication#top'}>
-                                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
-                                            <p>{t('profile')}</p>
-                                        </a>
-                                }
-                            </>
-                        }
+                                        </a> : user?.role === 'student' ?
+                                            <a className={'sidebar-menu-item'} data-title={t('profile')}
+                                               href={import.meta.env.VITE_APP_FRONTEND_STUDENT_URL}>
+                                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
+                                                <p>{t('profile')}</p>
+                                            </a> :
+                                            <a className={'sidebar-menu-item'} data-title={t('profile')}
+                                               href={import.meta.env.VITE_APP_FRONTEND_USER_URL + 'authentication#top'}>
+                                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
+                                                <p>{t('profile')}</p>
+                                            </a>
+                                    }
+                                </>
+                            }
+                        </div>
                     </div>
                 </aside>
             </main>
