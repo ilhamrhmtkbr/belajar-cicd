@@ -2,7 +2,6 @@
 name: CI/CD Pipeline
 
 on:
-  # CI: Integration Testing (Pull Request ke main)
   pull_request:
     branches: [ main ]
 
@@ -60,7 +59,7 @@ jobs:
           mkdir -p backend-laravel/_shared
           cat > backend-laravel/_shared/.env.shared << EOF
           APP_NAME=iamra.course
-          APP_ENV=local
+          APP_ENV=testing
           APP_DEBUG=true
           APP_TIMEZONE=Asia/Jakarta
           APP_KEY=$APP_KEY
@@ -122,22 +121,22 @@ jobs:
           echo "🚀 Starting Docker services..."
 
           # Start databases dulu
-          sudo docker compose -f docker-compose.ci.yaml up -d database-mysql database-redis database-mongo
+          sudo docker compose -f docker-compose-ci-integration-test.yaml up -d database-mysql database-redis database-mongo
           echo "⏳ Waiting for databases..."
           sleep 45
 
           # Start user API dulu (most important)
-          sudo docker compose -f docker-compose.ci.yaml up -d backend-api-user
+          sudo docker compose -f docker-compose-ci-integration-test.yaml up -d backend-api-user
           echo "⏳ Waiting for user API..."
           sleep 30
 
           # Start services yang depend ke user API
-          sudo docker compose -f docker-compose.ci.yaml up -d backend-api-student backend-api-instructor backend-api-forum backend-api-public
+          sudo docker compose -f docker-compose-ci-integration-test.yaml up -d backend-api-student backend-api-instructor backend-api-forum backend-api-public
           echo "⏳ Waiting for all APIs..."
           sleep 45
 
           # Check if all containers are running
-          sudo docker compose -f docker-compose.ci.yaml ps
+          sudo docker compose -f docker-compose-ci-integration-test.yaml ps
 
       # Step 4: Setup Laravel applications
       - name: Setup Laravel Applications
@@ -150,21 +149,21 @@ jobs:
           echo "Setting up backend-api-user..."
 
           # Clear any existing cache first
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan cache:clear || true
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan config:clear || true
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:clear || true
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan cache:clear || true
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan config:clear || true
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan route:clear || true
 
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user composer install --no-interaction
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user composer install --no-interaction
 
           # Setup storage untuk user service
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user mkdir -p storage/logs
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user touch storage/logs/laravel.log  
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user chmod -R 777 storage bootstrap/cache
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user mkdir -p storage/logs
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user touch storage/logs/laravel.log  
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user chmod -R 777 storage bootstrap/cache
 
           # Baru kemudian cache (setelah database ready)
           echo "Caching config and routes for user service..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan config:cache
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:cache
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan config:cache
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan route:cache
 
           echo "⏳ Waiting for user service to be ready..."
 
@@ -180,25 +179,25 @@ jobs:
             echo "Setting up backend-api-$service..."
 
             # Clear cache first
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan cache:clear || true
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:clear || true
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:clear || true
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan cache:clear || true
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan config:clear || true
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan route:clear || true
 
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service composer install --no-interaction
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service composer install --no-interaction
 
             # Setup storage
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service mkdir -p storage/logs
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service touch storage/logs/laravel.log
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service chmod -R 777 storage bootstrap/cache
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service mkdir -p storage/logs
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service touch storage/logs/laravel.log
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service chmod -R 777 storage bootstrap/cache
 
             # Migrate if needed (hanya untuk services yang punya database sendiri)
             if [ "$service" = "public" ]; then
-              sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan migrate:fresh --seed
+              sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan migrate:fresh --seed
             fi
 
             # Cache setelah setup
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan config:cache
-            sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-$service php artisan route:cache
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan config:cache
+            sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-$service php artisan route:cache
           done
 
           echo "✅ All Laravel applications setup completed!"
@@ -211,18 +210,18 @@ jobs:
 
           # Check container status
           echo "---- Container Status ----"
-          sudo docker compose -f docker-compose.ci.yaml ps
+          sudo docker compose -f docker-compose-ci-integration-test.yaml ps
 
           echo "---- Network Information ----"
           sudo docker network ls
 
           # Test user route
           echo "🔍 Testing user route..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan route:list || true
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan route:list || true
 
           # Test login endpoint
           echo "🔍 Test dari container student ke user..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student curl -v \
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-student curl -v \
             -X POST \
             -H "Content-Type: application/json" \
             -H "Accept: application/json" \
@@ -238,19 +237,19 @@ jobs:
 
           # Test dalam urutan dependency
           echo "Testing backend-api-user (base service)..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --debug --stop-on-failure
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-user php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-student..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student php artisan test --debug --stop-on-failure
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-student php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-instructor..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --debug --stop-on-failure
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-instructor php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-forum..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --debug --stop-on-failure
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-forum php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-public..."
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
+          sudo docker compose -f docker-compose-ci-integration-test.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
 
           echo "✅ All integration tests passed!"
 
@@ -259,7 +258,219 @@ jobs:
         if: always()
         run: |
           cd docker/dev
-          sudo docker compose -f docker-compose.ci.yaml down -v --remove-orphans
+          sudo docker compose -f docker-compose-ci-integration-test.yaml down -v --remove-orphans
+          sudo docker system prune -f
+
+  # ===========================
+  # JOB 2: K6 TESTING
+  # Jalan cuma pas Pull Request ke main
+  # ===========================
+  k6-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Step 1: Generate shared secrets untuk semua container
+      - name: Generate Shared Environment Variables
+        run: |
+          echo "🔧 Generating shared environment variables..."
+
+          # Generate APP_KEY (Laravel format)
+          APP_KEY="base64:$(openssl rand -base64 32)"
+          echo "Generated APP_KEY: $APP_KEY"
+
+          # Generate JWT_SECRET (untuk semua container)
+          JWT_SECRET=$(openssl rand -base64 64)
+          echo "Generated JWT_SECRET: $JWT_SECRET"
+
+          # Generate REVERB secrets (untuk user & forum)
+          REVERB_APP_ID="ci-$(date +%s)"
+          REVERB_APP_KEY="ci-key-$(openssl rand -hex 8)"  
+          REVERB_APP_SECRET="ci-secret-$(openssl rand -base64 32)"
+
+          # Save ke environment variables untuk step berikutnya
+          echo "APP_KEY=$APP_KEY" >> $GITHUB_ENV
+          echo "JWT_SECRET=$JWT_SECRET" >> $GITHUB_ENV
+          echo "REVERB_APP_ID=$REVERB_APP_ID" >> $GITHUB_ENV
+          echo "REVERB_APP_KEY=$REVERB_APP_KEY" >> $GITHUB_ENV
+          echo "REVERB_APP_SECRET=$REVERB_APP_SECRET" >> $GITHUB_ENV
+
+      # Step 2: Create environment files dengan generated secrets
+      - name: Create Environment Files
+        run: |
+          echo "📝 Creating environment files with generated secrets..."
+          cd docker/dev
+
+          # Shared environment untuk semua backend
+          mkdir -p backend-laravel/_shared
+          cat > backend-laravel/_shared/.env.shared << EOF
+          APP_NAME=iamra.course
+          APP_ENV=testing
+          APP_DEBUG=true
+          APP_TIMEZONE=Asia/Jakarta
+          APP_KEY=$APP_KEY
+
+          BCRYPT_ROUNDS=10
+          PHP_CLI_SERVER_WORKERS=4
+
+          DB_CONNECTION=mysql
+          DB_HOST=database-mysql
+          DB_PORT=3306
+          DB_DATABASE=iamra_course_test
+          DB_USERNAME=root
+          DB_PASSWORD=root
+
+          DB_CONNECTION_SECOND=mongodb
+          DB_HOST_SECOND=database-mongo
+          DB_PORT_SECOND=27017
+          DB_DATABASE_SECOND=iamra_course
+          DB_USERNAME_SECOND=
+          DB_PASSWORD_SECOND=
+          DB_AUTHENTICATION_DATABASE_SECOND=iamra
+
+          SESSION_DRIVER=redis
+          SESSION_LIFETIME=120
+          SESSION_ENCRYPT=false
+          SESSION_PATH=/
+          SESSION_DOMAIN=null
+
+          QUEUE_CONNECTION=redis
+
+          CACHE_DRIVER=redis
+          CACHE_STORE=redis
+          CACHE_PREFIX=
+
+          REDIS_CLIENT=phpredis
+          REDIS_HOST=database-redis
+          REDIS_PASSWORD=null
+          REDIS_PORT=6379
+          REDIS_PREFIX=
+
+          # JWT Secret yang sama untuk semua container
+          JWT_SECRET=$JWT_SECRET
+
+          USER_API_VERSION=user-api/v1
+          STUDENT_API_VERSION=student-api/v1
+          INSTRUCTOR_API_VERSION=instructor-api/v1
+          PUBLIC_API_VERSION=public-api/v1
+          FORUM_API_VERSION=forum-api/v1
+
+          EOF
+
+          echo "✅ All environment files created with shared secrets!"
+
+      # Step 3: Start Docker dengan environment files yang udah dibuat
+      - name: Start Docker Services
+        run: |
+          cd docker/dev
+
+          echo "🚀 Starting Docker services..."
+
+          # Start databases dulu
+          sudo docker compose -f docker-compose-ci-k6-test.yaml up -d database-mysql database-redis
+          echo "⏳ Waiting for databases..."
+          sleep 45
+
+          # Start user API dulu (most important)
+          sudo docker compose -f docker-compose-ci-k6-test.yaml up -d backend-api-user
+          echo "⏳ Waiting for user API..."
+          sleep 30
+
+          # Start services yang depend ke user API
+          sudo docker compose -f docker-compose-ci-k6-test.yaml up -d backend-api-public
+          echo "⏳ Waiting for all APIs..."
+          sleep 45
+
+          # Check if all containers are running
+          sudo docker compose -f docker-compose-ci-k6-test.yaml ps
+
+      # Step 4: Setup Laravel applications
+      - name: Setup Laravel Applications
+        run: |
+          cd docker/dev
+
+          echo "⚙️ Setting up Laravel applications..."
+
+          # Setup user API dulu (karena yang lain depend ke ini)
+          echo "Setting up backend-api-user..."
+
+          # Clear any existing cache first
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user php artisan cache:clear || true
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user php artisan config:clear || true
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user php artisan route:clear || true
+
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user composer install --no-interaction
+
+          # Setup storage untuk user service
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user mkdir -p storage/logs
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user touch storage/logs/laravel.log  
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user chmod -R 777 storage bootstrap/cache
+
+          echo "Caching config and routes for user service..."
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user php artisan config:cache
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-user php artisan route:cache
+
+          echo "⏳ Waiting for user service to be ready..."
+
+          # Wait for FrankenPHP to fully start (lebih simple approach)
+          echo "Waiting for FrankenPHP to start..."
+          sleep 60
+
+          # Clear cache first
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan cache:clear || true
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan config:clear || true
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan route:clear || true
+
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public composer install --no-interaction
+
+          # Setup storage
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public mkdir -p storage/logs
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public touch storage/logs/laravel.log
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public chmod -R 777 storage bootstrap/cache
+
+          # Migrate
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan migrate:fresh --seed
+
+          # Cache setelah setup
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan config:cache
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T backend-api-public php artisan route:cache
+
+          echo "✅ All Laravel applications setup completed!"
+
+      # Step 5: Debug and Test Services
+      - name: Debug Services Before Tests
+        run: |
+          cd docker/dev
+          echo "🔍 Debugging all services..."
+
+          # Check container status
+          echo "---- Container Status ----"
+          sudo docker compose -f docker-compose-ci-k6-test.yaml ps
+
+          echo "---- Network Information ----"
+          sudo docker network ls
+
+      # Step 6: Run K6 Tests
+      - name: Run K6 Tests
+        run: |
+          cd docker/dev
+
+          echo "🧪 Running k6 tests..."
+
+          # Test dalam urutan dependency
+          echo "Testing backend-api-user (base service)..."
+          sudo docker compose -f docker-compose-ci-k6-test.yaml exec -T set-k6 run /k6-scripts/test/register.js 
+
+          echo "✅ All k6 tests passed!"
+
+      # Step 7: Cleanup
+      - name: Cleanup Docker
+        if: always()
+        run: |
+          cd docker/dev
+          sudo docker compose -f docker-compose-ci-k6-test.yaml down -v --remove-orphans
           sudo docker system prune -f
 
   # ===========================

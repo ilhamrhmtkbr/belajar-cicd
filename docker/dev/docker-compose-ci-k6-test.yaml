@@ -1,0 +1,80 @@
+# docker/dev/docker-compose.ci.yaml
+# Copy dari docker-compose.yaml lo, cuma buang frontend & monitoring
+
+services:
+  database-mysql:
+    image: mysql:8.0
+    container_name: database-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: iamra_course_test  # Database buat testing
+    ports:
+      - "3307:3306"
+    networks:
+      - iamra_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 10
+      timeout: 10s
+
+  database-redis:
+    image: redis:latest
+    container_name: database-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - iamra_net
+
+  # Copy persis dari docker-compose.yaml lo
+  backend-api-user:
+    build:
+      context: ../../
+      dockerfile: docker/dev/backend-laravel/user/Dockerfile.api-user
+    container_name: backend-api-user
+    volumes:
+      - "../../backend-api-user:/app"
+    depends_on:
+      database-mysql:
+        condition: service_healthy
+      database-redis:
+        condition: service_started
+      database-mongo:
+        condition: service_started
+    # Environment dari file yang dibuat di workflow
+    env_file:
+      - "backend-laravel/_shared/.env.shared"
+    networks:
+      - iamra_net
+
+  backend-api-public:
+    build:
+      context: ../../
+      dockerfile: docker/dev/backend-laravel/public/Dockerfile.api-public
+    container_name: backend-api-public
+    volumes:
+      - "../../backend-api-public:/app"
+    depends_on:
+      database-mysql:
+        condition: service_healthy
+      database-redis:
+        condition: service_started
+      database-mongo:
+        condition: service_started
+    env_file:
+      - "backend-laravel/_shared/.env.shared"
+    networks:
+      - iamra_net
+
+  set-k6:
+    image: grafana/k6:latest
+    container_name: set-k6
+    volumes:
+      - "../../set-k6:/k6-scripts"
+    networks:
+      - iamra_net
+    profiles:
+      - testing
+
+networks:
+  iamra_net:
+    driver: bridge
