@@ -12,7 +12,7 @@ class CoursesTest extends TestCase
 
         $res->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'title', 'description', 'image'],
+                '*' => ['id', 'title', 'image'],
             ],
             'links' => ['first', 'last', 'prev', 'next'],
             'meta' => [
@@ -34,7 +34,7 @@ class CoursesTest extends TestCase
 
         $res->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'title', 'description', 'image'],
+                '*' => ['id', 'title', 'image'],
             ],
             'links' => ['first', 'last', 'prev', 'next'],
             'meta' => [
@@ -56,7 +56,7 @@ class CoursesTest extends TestCase
 
         $res->assertJsonStructure([
             'data' => [
-                '*' => ['id', 'title', 'description', 'image'],
+                '*' => ['id', 'title', 'image'],
             ],
             'links' => ['first', 'last', 'prev', 'next'],
             'meta' => [

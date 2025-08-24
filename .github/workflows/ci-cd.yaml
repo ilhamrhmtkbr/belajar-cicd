@@ -383,6 +383,8 @@ jobs:
           echo "⏳ Waiting for all APIs..."
           sleep 45
 
+          sudo docker compose -f docker-compose-ci-k6-test.yaml up -d set-k6
+
           # Check if all containers are running
           sudo docker compose -f docker-compose-ci-k6-test.yaml ps
 
