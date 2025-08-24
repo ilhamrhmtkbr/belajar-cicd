@@ -38,8 +38,6 @@ services:
         condition: service_healthy
       database-redis:
         condition: service_started
-      database-mongo:
-        condition: service_started
     # Environment dari file yang dibuat di workflow
     env_file:
       - "backend-laravel/_shared/.env.shared"
@@ -57,8 +55,6 @@ services:
       database-mysql:
         condition: service_healthy
       database-redis:
-        condition: service_started
-      database-mongo:
         condition: service_started
     env_file:
       - "backend-laravel/_shared/.env.shared"
