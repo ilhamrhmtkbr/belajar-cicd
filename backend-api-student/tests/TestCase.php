@@ -17,9 +17,9 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         Repository::initData();
         $this->url = config('api.version');
-        $res = Http::post('http://backend-api-user/'. env('USER_API_VERSION') . '/v1/auth/login', [
-            'username' => Repository::INSTRUCTOR_USERNAME,
-            'password' => Repository::INSTRUCTOR_PASSWORD
+        $res = Http::post('http://backend-api-user/'. env('USER_API_VERSION') . '/auth/login', [
+            'username' => Repository::USERNAME,
+            'password' => Repository::PASSWORD
         ]);
         $cookies = $res->header('Set-Cookie');
         preg_match('/access_token=([^;]+)/', $cookies, $matches);
