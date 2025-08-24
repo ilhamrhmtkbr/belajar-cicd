@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Tests\utils\Repository;
 
-class Certificates extends TestCase
+class CertificatesTest extends TestCase
 {
     function test_student_berhasil_mendapatkan_seluruh_data_certificates()
     {

@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Tests\utils\Repository;
 
-class Progresses extends TestCase
+class ProgressesTest extends TestCase
 {
     function test_student_berhasil_mendapatkan_data_course_progresses()
     {

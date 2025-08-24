@@ -112,35 +112,6 @@ jobs:
           
           EOF
 
-          # Backend API User (punya REVERB)
-          cat > ../../backend-api-user/.env << EOF
-
-          # REVERB Configuration (WebSocket)
-          BROADCAST_CONNECTION=reverb
-          REVERB_APP_ID=$REVERB_APP_ID
-          REVERB_APP_KEY=$REVERB_APP_KEY
-          REVERB_APP_SECRET=$REVERB_APP_SECRET
-          REVERB_HOST=backend-api-user
-          REVERB_PORT=8080
-          REVERB_SCHEME=http
-          EOF
-
-          # Backend API Forum (punya REVERB)
-          cat > ../../backend-api-forum/.env << EOF
-          APP_NAME="Forum API CI"
-          APP_URL=http://backend-api-forum:8000
-          USER_API_URL=http://backend-api-user:8000
-
-          # REVERB Configuration (WebSocket)  
-          BROADCAST_CONNECTION=reverb
-          REVERB_APP_ID=$REVERB_APP_ID
-          REVERB_APP_KEY=$REVERB_APP_KEY
-          REVERB_APP_SECRET=$REVERB_APP_SECRET
-          REVERB_HOST=backend-api-forum
-          REVERB_PORT=8080
-          REVERB_SCHEME=http
-          EOF
-
           echo "✅ All environment files created with shared secrets!"
 
       # Step 3: Start Docker dengan environment files yang udah dibuat
@@ -266,36 +237,24 @@ jobs:
           echo "🧪 Running integration tests..."
 
           # Test dalam urutan dependency
-          # echo "Testing backend-api-user (base service)..."
-          # sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --debug --stop-on-failure
+          echo "Testing backend-api-user (base service)..."
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-user php artisan test --debug --stop-on-failure
 
           echo "Testing backend-api-student..."
           sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student php artisan test --debug --stop-on-failure
 
-          # echo "Testing backend-api-instructor..."
-          # sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --debug --stop-on-failure
+          echo "Testing backend-api-instructor..."
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-instructor php artisan test --debug --stop-on-failure
 
-          # echo "Testing backend-api-forum..."
-          # sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --debug --stop-on-failure
+          echo "Testing backend-api-forum..."
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-forum php artisan test --debug --stop-on-failure
 
-          # echo "Testing backend-api-public..."
-          # sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
+          echo "Testing backend-api-public..."
+          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-public php artisan test --debug --stop-on-failure
 
           echo "✅ All integration tests passed!"
 
-      - name: Show All Logs
-        if: failure()
-        run: |
-          cd docker/dev
-
-          echo "---- Docker container status ----"
-          sudo docker compose -f docker-compose.ci.yaml ps
-
-          echo "---- backend-api-student laravel.log ----"
-          
-          sudo docker compose -f docker-compose.ci.yaml exec -T backend-api-student cat storage/logs/laravel.log || true
-
-      # Step 6: Cleanup
+      # Step 7: Cleanup
       - name: Cleanup Docker
         if: always()
         run: |

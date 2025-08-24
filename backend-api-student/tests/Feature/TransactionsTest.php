@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use Tests\utils\Repository;
 
-class Transactions extends TestCase
+class TransactionsTest extends TestCase
 {
     public function test_student_berhasil_mendapatkan_semua_data_transactions(): void
     {

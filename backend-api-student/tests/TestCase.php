@@ -9,7 +9,7 @@ use Tests\utils\Repository;
 
 abstract class TestCase extends BaseTestCase
 {
-    public ?string $token;
+    public string $token;
     public string $url;
 
     protected function setUp(): void
@@ -17,47 +17,13 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         Repository::initData();
         $this->url = config('api.version');
-
-        try {
-            // Tambahkan headers yang diperlukan
-            $res = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ])->post('http://backend-api-user/' . env('USER_API_VERSION') . '/auth/login', [
-                'username' => Repository::USERNAME,
-                'password' => Repository::PASSWORD
-            ]);
-
-            Log::info('Login Response:', [
-                'status' => $res->status(),
-                'body' => $res->json(),
-                'headers' => $res->headers()
-            ]);
-
-            if ($res->successful()) {
-                $cookies = $res->header('Set-Cookie');
-                if (is_array($cookies)) {
-                    $cookies = implode('; ', $cookies);
-                }
-
-                preg_match('/access_token=([^;]+)/', $cookies, $matches);
-                $this->token = $matches[1] ?? null;
-
-                if (!$this->token) {
-                    Log::error('Token not found in cookies', ['cookies' => $cookies]);
-                }
-            } else {
-                Log::error('Login failed', [
-                    'status' => $res->status(),
-                    'response' => $res->json()
-                ]);
-                $this->token = null;
-            }
-
-        } catch (\Exception $e) {
-            Log::error('Login exception', ['error' => $e->getMessage()]);
-            $this->token = null;
-        }
+        $res = Http::post('http://backend-api-user/'. env('USER_API_VERSION') . '/v1/auth/login', [
+            'username' => Repository::INSTRUCTOR_USERNAME,
+            'password' => Repository::INSTRUCTOR_PASSWORD
+        ]);
+        $cookies = $res->header('Set-Cookie');
+        preg_match('/access_token=([^;]+)/', $cookies, $matches);
+        $this->token = $matches[1] ?? null;
     }
 
     protected function tearDown(): void
