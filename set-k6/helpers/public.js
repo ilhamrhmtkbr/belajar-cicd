@@ -1,10 +1,8 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const BASE_URL = 'http://olcourse-backend:8000/api';
-
 export function getCourses(token) {
-    const url = `${BASE_URL}/courses`;
+    const url = `http://backend-api-public/public-api/v1/courses`;
     const params = {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -18,7 +16,7 @@ export function getCourses(token) {
 }
 
 export function enrollCourse(token, courseId) {
-    const url = `${BASE_URL}/courses/${courseId}/enroll`;
+    const url = `http://backend-api-public/public-api/v1/courses/${courseId}/enroll`;
     const params = {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -34,7 +32,7 @@ export function enrollCourse(token, courseId) {
 }
 
 export function viewCourseContent(token, courseId) {
-    const url = `${BASE_URL}/courses/${courseId}/content`;
+    const url = `http://backend-api-public/public-api/v1/courses/${courseId}/content`;
     const params = {
         headers: {
             'Authorization': `Bearer ${token}`,

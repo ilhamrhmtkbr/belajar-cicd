@@ -48,7 +48,6 @@ jobs:
           echo "REVERB_APP_ID=$REVERB_APP_ID" >> $GITHUB_ENV
           echo "REVERB_APP_KEY=$REVERB_APP_KEY" >> $GITHUB_ENV
           echo "REVERB_APP_SECRET=$REVERB_APP_SECRET" >> $GITHUB_ENV
-          echo "API_URL=http://backend-api-user/user-api/v1" >> $GITHUB_ENV
 
       # Step 2: Create environment files dengan generated secrets
       - name: Create Environment Files

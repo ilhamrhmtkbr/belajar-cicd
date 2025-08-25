@@ -160,9 +160,6 @@ services:
     volumes:
       - "../../frontend-user:/app"
       - "./frontend-react/.env.shared:/app/.env"
-    environment:
-      - VITE_CLIENT_GOOGLE=501957692849-nprqfdeclrvjseadfs3bpru3arci95eg.apps.googleusercontent.com
-      - VITE_API_KEY_OPEN_CAGE_DATA=1c364950870b42049cebeb19d1669abe
     depends_on:
       - backend-api-user
     networks:

@@ -1,10 +1,8 @@
 import http from 'k6/http';
 import { check } from 'k6';
 
-const BASE_URL = __ENV.API_URL;
-
 export function register(first_name, middle_name, last_name, username, password, password_confirmation) {
-    const url = `${BASE_URL}/auth/register`;
+    const url = `http://backend-api-user/user-api/v1/auth/register`;
     const payload = JSON.stringify({
         first_name: first_name,
         middle_name: middle_name,

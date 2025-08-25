@@ -9,6 +9,7 @@
 **/backend-api-*/.env.local
 **/backend-api-*/.env.production
 **/backend-api-*/.env.staging
+**/docker/dev/docker-compose.yaml
 
 # Laravel Dependencies & Cache
 **/backend-api-*/vendor/
