@@ -25,7 +25,7 @@ export function register(first_name, middle_name, last_name, username, password,
     console.log(res.body);
 
     check(res, {
-        'register status is success (201) or user exists (409)': (r) => r.status === 201 || r.status === 409,
+        'login success (200)': (r) => r.status === 200 && r.json('success') === true,
     });
 
     return res;
