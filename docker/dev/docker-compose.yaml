@@ -388,7 +388,7 @@ services:
       - "../../set-k6:/k6-scripts"
       - "../../set-k6/results:/shared"
     environment:
-      - API_URL=http://server-nginx:80/api/v1
+      - API_URL=http://server-nginx:80/user-api/v1
       - K6_PROMETHEUS_RW_SERVER_URL=http://set-prometheus:9090/api/v1/write
       - K6_PROMETHEUS_RW_TREND_AS_NATIVE_HISTOGRAM=false
       - K6_PROMETHEUS_RW_STALE_MARKERS=true

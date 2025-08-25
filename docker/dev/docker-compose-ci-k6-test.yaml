@@ -66,6 +66,8 @@ services:
     container_name: set-k6
     volumes:
       - "../../set-k6:/k6-scripts"
+    environment:
+      - API_URL=http://backend-api-user/user-api/v1
     networks:
       - iamra_net
     profiles:
