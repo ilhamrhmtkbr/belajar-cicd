@@ -9,11 +9,11 @@
 **/backend-api-*/.env.local
 **/backend-api-*/.env.production
 **/backend-api-*/.env.staging
+**/docker/dev/docker-compose.yaml
 
 # Laravel Dependencies & Cache
 **/backend-api-*/vendor/
 **/backend-api-*/node_modules/
-**/backend-api-*/storage/app/*
 **/backend-api-*/storage/framework/cache/*
 **/backend-api-*/storage/framework/sessions/*
 **/backend-api-*/storage/framework/views/*
@@ -24,7 +24,6 @@
 **/backend-api-*/storage/oauth-private.key
 **/backend-api-*/storage/oauth-public.key
 **/backend-api-*/.phpunit.result.cache
-**/backend-api-*/artisan
 
 # DLL files (kayaknya custom Anda)
 **/dll/

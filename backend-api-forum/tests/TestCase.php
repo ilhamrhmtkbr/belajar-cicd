@@ -27,7 +27,7 @@ abstract class TestCase extends BaseTestCase
 
     public function getToken(string $username, string $password): ?string
     {
-        $res = Http::post('http://backend-api-user/user-api/v1/auth/login', [
+        $res = Http::post('http://backend-api-user/' . env('USER_API_VERSION') . '/auth/login', [
             'username' => $username,
             'password' => $password
         ]);

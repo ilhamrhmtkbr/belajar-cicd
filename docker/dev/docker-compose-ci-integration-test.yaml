@@ -51,7 +51,6 @@ services:
     # Environment dari file yang dibuat di workflow
     env_file:
       - "backend-laravel/_shared/.env.shared"
-      - "../../backend-api-user/.env"
     networks:
       - iamra_net
 
@@ -71,7 +70,6 @@ services:
         condition: service_started
     env_file:
       - "backend-laravel/_shared/.env.shared"
-      - "../../backend-api-student/.env"
     networks:
       - iamra_net
 
@@ -91,7 +89,6 @@ services:
         condition: service_started
     env_file:
       - "backend-laravel/_shared/.env.shared"
-      - "../../backend-api-instructor/.env"
     networks:
       - iamra_net
 
@@ -106,7 +103,6 @@ services:
       - backend-api-user
     env_file:
       - "backend-laravel/_shared/.env.shared"
-      - "../../backend-api-forum/.env"
     networks:
       - iamra_net
 
@@ -126,7 +122,6 @@ services:
         condition: service_started
     env_file:
       - "backend-laravel/_shared/.env.shared"
-      - "../../backend-api-public/.env"
     networks:
       - iamra_net
 

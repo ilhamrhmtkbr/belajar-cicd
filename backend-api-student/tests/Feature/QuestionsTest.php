@@ -75,10 +75,7 @@ class QuestionsTest extends TestCase
     {
         Repository::insertStudentBuyCourse();
         $res = $this->withUnencryptedCookie('access_token', $this->token)
-            ->post($this->url . '/questions' , [
-                'instructor_course_id' => '',
-                'question' => ''
-            ]);
+            ->post($this->url . '/questions' );
         $res->assertStatus(422)
             ->assertJson([
                 'success' => false,

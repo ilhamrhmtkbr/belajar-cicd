@@ -217,8 +217,8 @@ services:
       - "../../frontend-user:/app"
       - "./frontend-react/.env.shared:/app/.env"
     environment:
-      - VITE_CLIENT_GOOGLE=501957692849-nprqfdeclrvjseadfs3bpru3arci95eg.apps.googleusercontent.com
-      - VITE_API_KEY_OPEN_CAGE_DATA=1c364950870b42049cebeb19d1669abe
+      - VITE_CLIENT_GOOGLE=YOUR_CLIENT_GOOGLE
+      - VITE_API_KEY_OPEN_CAGE_DATA=YOUR_API_KEY_OPEN_CAGE_DATA
     depends_on:
       - backend-api-user
     networks:
@@ -335,7 +335,7 @@ services:
     depends_on:
       - server-nginx
     environment:
-      NGROK_AUTHTOKEN: "2a0uiHZxc8OP2aVKaOn7dUlhG2f_5Fj1qNovroHTHhLxHR5mM"
+      NGROK_AUTHTOKEN: "YOUR_TOKEN"
     command: "http server-nginx:80"
     networks:
       - iamra_net

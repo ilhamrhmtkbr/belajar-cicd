@@ -29,6 +29,7 @@ class LoginTest extends TestCase
                 "success" => true,
                 "message" => "Login successfully"
             ]);
+
         Helper::deleteUser();
     }
 

@@ -56,62 +56,70 @@ const Layout = () => {
                     <Outlet/>
                 </section>
                 <aside className={`sidebar-menu`}>
-                    <div className="sidebar-menu-title sidebar-menu-item"
-                         onClick={() => setMinifySidebar(prevState => !prevState)}>
-                        <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
-                        <p>Menu</p>
-                    </div>
-                    <div className="sidebar-menu-element">
-                        <a className={'sidebar-menu-item'} data-title={t('Homepage')}
-                           href={import.meta.env.VITE_APP_FRONTEND_PUBLIC_URL}>
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'homepage'}/>
-                            <p>{t('Homepage')}</p>
-                        </a>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/' ? 'active' : ''}`}
-                                  data-title={t('profile')} to="/#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
-                            <p>{t('profile')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/courses' ? 'active' : ''}`}
-                                  data-title={t('courses')} to="/courses#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'courses'}/>
-                            <p>{t('courses')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/coupons' ? 'active' : ''}`}
-                                  data-title={t('coupons')} to="/coupons#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'coupons'}/>
-                            <p>{t('coupons')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/answers' ? 'active' : ''}`}
-                                  data-title={t('answers')} to="/answers#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'answers'}/>
-                            <p>{t('answers')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/reviews' ? 'active' : ''}`}
-                                  data-title={t('reviews')} to="/reviews#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'reviews'}/>
-                            <p>{t('reviews')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/earnings' ? 'active' : ''}`}
-                                  data-title={t('earnings')} to="/earnings#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'earnings'}/>
-                            <p>{t('earnings')}</p>
-                        </HashLink>
-                        <HashLink className={`sidebar-menu-item ${location.pathname === '/socials' ? 'active' : ''}`}
-                                  data-title={t('socials')} to="/socials#top">
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'socials'}/>
-                            <p>{t('socials')}</p>
-                        </HashLink>
-                        <a className={'sidebar-menu-item'} data-title={t('forum')}
-                           href={import.meta.env.VITE_APP_FRONTEND_FORUM_URL}>
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'forum'}/>
-                            <p>{t('forum')}</p>
-                        </a>
-                        <a className={'sidebar-menu-item'} data-title={t('setting')}
-                           href={import.meta.env.VITE_APP_FRONTEND_USER_URL + '/member/additional-info#top'}>
-                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'setting'}/>
-                            <p>{t('setting')}</p>
-                        </a>
+                    <div className={'sidebar-menu-content'}>
+                        <div className="sidebar-menu-title sidebar-menu-item"
+                             onClick={() => setMinifySidebar(prevState => !prevState)}>
+                            <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'click'}/>
+                            <p>Menu</p>
+                        </div>
+                        <div className="sidebar-menu-element">
+                            <a className={'sidebar-menu-item'} data-title={t('Homepage')}
+                               href={import.meta.env.VITE_APP_FRONTEND_PUBLIC_URL}>
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'homepage'}/>
+                                <p>{t('Homepage')}</p>
+                            </a>
+                            <HashLink className={`sidebar-menu-item ${location.pathname === '/' ? 'active' : ''}`}
+                                      data-title={t('profile')} to="/#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'profile'}/>
+                                <p>{t('profile')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/courses' ? 'active' : ''}`}
+                                data-title={t('courses')} to="/courses#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'courses'}/>
+                                <p>{t('courses')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/coupons' ? 'active' : ''}`}
+                                data-title={t('coupons')} to="/coupons#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'coupons'}/>
+                                <p>{t('coupons')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/answers' ? 'active' : ''}`}
+                                data-title={t('answers')} to="/answers#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'answers'}/>
+                                <p>{t('answers')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/reviews' ? 'active' : ''}`}
+                                data-title={t('reviews')} to="/reviews#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'reviews'}/>
+                                <p>{t('reviews')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/earnings' ? 'active' : ''}`}
+                                data-title={t('earnings')} to="/earnings#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'earnings'}/>
+                                <p>{t('earnings')}</p>
+                            </HashLink>
+                            <HashLink
+                                className={`sidebar-menu-item ${location.pathname === '/socials' ? 'active' : ''}`}
+                                data-title={t('socials')} to="/socials#top">
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'socials'}/>
+                                <p>{t('socials')}</p>
+                            </HashLink>
+                            <a className={'sidebar-menu-item'} data-title={t('forum')}
+                               href={import.meta.env.VITE_APP_FRONTEND_FORUM_URL}>
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'forum'}/>
+                                <p>{t('forum')}</p>
+                            </a>
+                            <a className={'sidebar-menu-item'} data-title={t('setting')}
+                               href={import.meta.env.VITE_APP_FRONTEND_USER_URL + '/member/additional-info#top'}>
+                                <SvgComp rule={'sidebar-menu-button-svg'} file={'sprite'} icon={'setting'}/>
+                                <p>{t('setting')}</p>
+                            </a>
+                        </div>
                     </div>
                 </aside>
             </main>
@@ -126,13 +134,15 @@ const Layout = () => {
                     }} alt={import.meta.env.VITE_APP_NAME}/>
                     <h1>iamra</h1>
                     <p>Senen, Jakarta Pusat</p>
-                    <p>copyright &copy; <a className='text-primary text-hover-underline cursor-pointer' href={import.meta.env.VITE_APP_URL_PROFILE}>Ilham
+                    <p>copyright &copy; <a className='text-primary text-hover-underline cursor-pointer'
+                                           href={import.meta.env.VITE_APP_URL_PROFILE}>Ilham
                         Rahmat Akbar</a> 2025</p>
                 </div>
 
                 <div className="grid-start">
                     <h2 className='font-medium margin-bottom-s'>My Contact</h2>
-                    <a className='text-hover-underline' target='_blank' href={import.meta.env.VITE_LINK_GITHUB}>Github</a>
+                    <a className='text-hover-underline' target='_blank'
+                       href={import.meta.env.VITE_LINK_GITHUB}>Github</a>
                     <a className='text-hover-underline' target='_blank' href={import.meta.env.VITE_LINK_EMAIL}>Email</a>
                     <a className='text-hover-underline' target='_blank'
                        href={import.meta.env.VITE_LINK_INSTAGRAM}>Instagram</a>
@@ -155,13 +165,23 @@ const Layout = () => {
                     <div className={'flex-aic-jcs gap-m'}>
                         <div>Lang:</div>
                         <div className={'flex-aic-jcs gap-s'}>
-                            <div className={`text-hover-underline cursor-pointer ${lang === 'id' ? 'bg-primary radius-s' : ''}`}
-                                 style={{paddingLeft: 3, paddingRight: 3, color: lang === 'id' ? 'white' : 'var(--text-color)'}}
-                                 onClick={() => handleChangeLang('id')}>id
+                            <div
+                                className={`text-hover-underline cursor-pointer ${lang === 'id' ? 'bg-primary radius-s' : ''}`}
+                                style={{
+                                    paddingLeft: 3,
+                                    paddingRight: 3,
+                                    color: lang === 'id' ? 'white' : 'var(--text-color)'
+                                }}
+                                onClick={() => handleChangeLang('id')}>id
                             </div>
-                            <div className={`text-hover-underline cursor-pointer ${lang === 'en' ? 'bg-primary radius-s' : ''}`}
-                                 style={{paddingLeft: 3, paddingRight: 3, color: lang === 'en' ? 'white' : 'var(--text-color)'}}
-                                 onClick={() => handleChangeLang('en')}>en
+                            <div
+                                className={`text-hover-underline cursor-pointer ${lang === 'en' ? 'bg-primary radius-s' : ''}`}
+                                style={{
+                                    paddingLeft: 3,
+                                    paddingRight: 3,
+                                    color: lang === 'en' ? 'white' : 'var(--text-color)'
+                                }}
+                                onClick={() => handleChangeLang('en')}>en
                             </div>
                         </div>
                     </div>
